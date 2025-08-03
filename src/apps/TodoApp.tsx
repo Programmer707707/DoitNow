@@ -7,10 +7,8 @@ import {
 } from '@mui/material';
 import ListRendering from './TodoComponents/ListRendering';
 import ModalTodo from './TodoComponents/ModalTodo';
-import { todoReducer, type Todo } from './TodoComponents/TodoReducer';
-import { useEffect, useReducer } from 'react';
 import React from 'react';
-import useLocalStorage from './customHooks/useLocalStorage';
+import { useTodoStore } from '../store/todoStore';
 
 type Props = {
   toggleTheme: () => void;
@@ -18,15 +16,9 @@ type Props = {
 };
 
 const TodoApp = React.memo(({toggleTheme, mode}: Props) => {
-    const [storedTodos, setStoredTodos] = useLocalStorage<Todo[]>('todos',[]);
-    const [todos, dispatch] = useReducer(todoReducer, storedTodos);
 
+    const resetTodos = useTodoStore(state => state.resetTodos)
 
-    useEffect(()=>{if (todos.length > 0) {
-          setStoredTodos(todos);
-        } else {
-          localStorage.removeItem('todos');
-        }}, [todos])
 
     return (
         <Container maxWidth="md" sx={{ mt: 5 }}>
@@ -35,22 +27,18 @@ const TodoApp = React.memo(({toggleTheme, mode}: Props) => {
           </Typography>
 
           <Box display="flex" justifyContent="space-between" mb={3}>
-            <ModalTodo todos={todos} dispatch={dispatch} />
+            <ModalTodo/>
             <Box display="flex" gap={2}>
               <Button variant="contained" onClick={toggleTheme}>
                 {mode === 'light' ? 'Dark' : 'Light'} Mode
               </Button>
-              <Button variant="outlined" color="error" onClick={() => {
-                dispatch({ type: 'RESET' });
-                setStoredTodos([]);
-                localStorage.removeItem('todos');
-              }}>
+              <Button variant="outlined" color="error" onClick={resetTodos}>
                 Reset
               </Button>
             </Box>
           </Box>
           
-          <ListRendering todos={todos} dispatch={dispatch} />
+          <ListRendering/>
         </Container>
 
     );

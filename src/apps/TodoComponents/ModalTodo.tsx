@@ -1,4 +1,4 @@
-import React, {useState, useRef, useEffect, useCallback} from 'react'
+import {useState, useRef, useEffect, useCallback} from 'react'
 import {
   Box,
   Typography,
@@ -6,21 +6,11 @@ import {
   Button,
   Modal,
 } from '@mui/material';
-import type { TodoAction } from './TodoReducer';
+import { useTodoStore } from '../../store/todoStore';
 
-type Todo = {
-    id: number;
-    text: string;
-    done: boolean;
-};
+const ModalTodo = () => {
+    const addTodo = useTodoStore(state => state.addTodo);
 
-type Props = {
-  todos: Todo[];
-  dispatch: React.Dispatch<TodoAction>;
-};
-
-
-const ModalTodo = React.memo(({ dispatch }: Props) => {
     // Modal
     const [modalOpen, setModalOpen] = useState(false);
     
@@ -36,18 +26,14 @@ const ModalTodo = React.memo(({ dispatch }: Props) => {
     }, [modalOpen])
 
 
-    const addTodo = useCallback(() => {
-        if(input.trim() === '') return;
-
-        const newTodo: Todo = {
-            id: Date.now(),
-            text: input,
-            done: false,
+    const addTodoHelper = useCallback(() => {
+        if(input.trim()){
+          addTodo(input);
+          setInput('');
+          setModalOpen(false);
         }
 
-        dispatch({type: 'ADD', payload: newTodo});
-        setInput('');
-    },[input, dispatch])
+    },[input, addTodo])
 
 
   return (
@@ -85,7 +71,7 @@ const ModalTodo = React.memo(({ dispatch }: Props) => {
 
                 <Box display="flex" justifyContent="flex-end" mt={3} gap={1}>
                   <Button variant="contained" onClick={() => {
-                    addTodo();
+                    addTodoHelper();
                     setModalOpen(false);
                   }}>
                     Save
@@ -102,6 +88,6 @@ const ModalTodo = React.memo(({ dispatch }: Props) => {
 
         </Box>
   )
-})
+};
 
 export default ModalTodo

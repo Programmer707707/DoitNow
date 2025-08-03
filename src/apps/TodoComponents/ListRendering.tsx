@@ -1,4 +1,4 @@
-import React, {useState, useMemo, useCallback} from 'react'
+import {useState, useMemo, useCallback} from 'react'
 import {
   TextField,
   Checkbox,
@@ -9,50 +9,31 @@ import {
 } from '@mui/material';
 import { Delete, Edit, Save, Close } from '@mui/icons-material';
 import Paper from '@mui/material/Paper';
-import type { TodoAction } from './TodoReducer';
+import { useTodoStore } from '../../store/todoStore';
 
 
+const ListRendering = () => {
+    const todos = useTodoStore((state) => state.todos)
+    const toggleTodo = useTodoStore((state) => state.toggleTodo)
+    const deleteTodo = useTodoStore((state) => state.deleteTodo)
+    const editTodo = useTodoStore((state) => state.editTodo)
 
-type Todo = {
-    id: number;
-    text: string;
-    done: boolean;
-};
-
-type Props = {
-  todos: Todo[];
-  dispatch: React.Dispatch<TodoAction>;
-};
-
-const ListRendering = React.memo(({ todos, dispatch }: Props) => {
     // Editing todo
     const [editingId, setEditingId] = useState<number | null>(null);
     const [editText, setEditText] = useState<string>('');
 
     // useMemo integrated
-    const completedTodos = useMemo(() => {
-        return todos.filter(todo => todo.done === true).length
-    },[todos])
+    const completedTodos = useMemo(() => todos.filter(todo => todo.done).length,[todos])
     
     const Editing = (id: number, currentText: string) => {
         setEditText(currentText);
         setEditingId(id);
     }
     const saveEdit = useCallback((id: number) => {
-        dispatch({type: 'EDIT', payload: { id, newText: editText } });
+        editTodo(id, editText);
         setEditText('');
         setEditingId(null);
-    },[dispatch,editText]);
-
-    const toggleTodo = useCallback((id: number) => {
-        dispatch({type: 'TOGGLE', payload: id});
-
-    },[dispatch]);
-
-    const deleteTodo = useCallback((id: number) => {
-        dispatch({type: 'DELETE', payload: id})
-    },[dispatch]);
-
+    },[editTodo,editText]);
 
 
     return (
@@ -115,6 +96,6 @@ const ListRendering = React.memo(({ todos, dispatch }: Props) => {
             }
         </Box>
     )
-},(prevProps, nextProps) => prevProps.todos === nextProps.todos)
+}
 
 export default ListRendering
