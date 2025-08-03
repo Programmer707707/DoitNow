@@ -6,10 +6,12 @@ import {
   Button,
   Modal,
 } from '@mui/material';
-import { useTodoStore } from '../../store/todoStore';
+
+import { useAppDispatch } from '../../redux-hooks/hooks';
+import { addTodo } from '../../features/todoSlice';
 
 const ModalTodo = () => {
-    const addTodo = useTodoStore(state => state.addTodo);
+    const dispatch = useAppDispatch();
 
     // Modal
     const [modalOpen, setModalOpen] = useState(false);
@@ -28,12 +30,12 @@ const ModalTodo = () => {
 
     const addTodoHelper = useCallback(() => {
         if(input.trim()){
-          addTodo(input);
+          dispatch(addTodo(input));
           setInput('');
           setModalOpen(false);
         }
 
-    },[input, addTodo])
+    },[input, dispatch])
 
 
   return (

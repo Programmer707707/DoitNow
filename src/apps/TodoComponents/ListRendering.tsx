@@ -9,31 +9,30 @@ import {
 } from '@mui/material';
 import { Delete, Edit, Save, Close } from '@mui/icons-material';
 import Paper from '@mui/material/Paper';
-import { useTodoStore } from '../../store/todoStore';
 
+import { useAppDispatch, useAppSelector } from '../../redux-hooks/hooks';
+import { toggleTodo, editTodo, deleteTodo } from '../../features/todoSlice';
 
 const ListRendering = () => {
-    const todos = useTodoStore((state) => state.todos)
-    const toggleTodo = useTodoStore((state) => state.toggleTodo)
-    const deleteTodo = useTodoStore((state) => state.deleteTodo)
-    const editTodo = useTodoStore((state) => state.editTodo)
+    const dispatch = useAppDispatch() 
+    const todos = useAppSelector((state) => state.todos.todos) 
 
     // Editing todo
     const [editingId, setEditingId] = useState<number | null>(null);
     const [editText, setEditText] = useState<string>('');
 
     // useMemo integrated
-    const completedTodos = useMemo(() => todos.filter(todo => todo.done).length,[todos])
+    const completedTodos = useMemo(() => todos.filter(t => t.done).length, [todos])
     
     const Editing = (id: number, currentText: string) => {
         setEditText(currentText);
         setEditingId(id);
     }
     const saveEdit = useCallback((id: number) => {
-        editTodo(id, editText);
+        dispatch(editTodo({id, newText: editText}));
         setEditText('');
         setEditingId(null);
-    },[editTodo,editText]);
+    },[dispatch,editText]);
 
 
     return (
@@ -46,7 +45,7 @@ const ListRendering = () => {
                   <Box display="flex" alignItems="center" gap={2} flex={1}>
                     <Checkbox
                       checked={todo.done}
-                      onChange={() => toggleTodo(todo.id)}
+                      onChange={() => dispatch(toggleTodo(todo.id))}
                     />
                     {editingId === todo.id ? (
                       <TextField fullWidth value={editText} onChange={(e) => setEditText(e.target.value)} />
@@ -66,7 +65,7 @@ const ListRendering = () => {
                     ) : (
                       <>
                         <IconButton onClick={() => Editing(todo.id, todo.text)}><Edit /></IconButton>
-                        <IconButton onClick={() => deleteTodo(todo.id)}><Delete /></IconButton>
+                        <IconButton onClick={() => dispatch(deleteTodo(todo.id))}><Delete /></IconButton>
                       </>
                     )}
                   </Box>

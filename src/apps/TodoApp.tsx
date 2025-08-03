@@ -8,7 +8,8 @@ import {
 import ListRendering from './TodoComponents/ListRendering';
 import ModalTodo from './TodoComponents/ModalTodo';
 import React from 'react';
-import { useTodoStore } from '../store/todoStore';
+import { useAppDispatch } from '../redux-hooks/hooks';
+import { resetTodos } from '../features/todoSlice';
 
 type Props = {
   toggleTheme: () => void;
@@ -16,9 +17,7 @@ type Props = {
 };
 
 const TodoApp = React.memo(({toggleTheme, mode}: Props) => {
-
-    const resetTodos = useTodoStore(state => state.resetTodos)
-
+    const dispatch = useAppDispatch();
 
     return (
         <Container maxWidth="md" sx={{ mt: 5 }}>
@@ -32,7 +31,7 @@ const TodoApp = React.memo(({toggleTheme, mode}: Props) => {
               <Button variant="contained" onClick={toggleTheme}>
                 {mode === 'light' ? 'Dark' : 'Light'} Mode
               </Button>
-              <Button variant="outlined" color="error" onClick={resetTodos}>
+              <Button variant="outlined" color="error" onClick={() => dispatch(resetTodos())}>
                 Reset
               </Button>
             </Box>
