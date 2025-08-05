@@ -5,11 +5,13 @@ import {
   Box,
   Button
 } from '@mui/material';
-import ListRendering from './TodoComponents/ListRendering';
-import ModalTodo from './TodoComponents/ModalTodo';
 import React from 'react';
 import { useAppDispatch } from '../redux-hooks/hooks';
 import { resetTodos } from '../features/todoSlice';
+import { lazy } from 'react';
+
+const ListRendering = lazy(() => import('./TodoComponents/ListRendering'));
+const ModalTodo = lazy(() => import('./TodoComponents/ModalTodo'));
 
 type Props = {
   toggleTheme: () => void;

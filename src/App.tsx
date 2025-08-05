@@ -2,12 +2,15 @@ import './App.css'
 import TodoApp from './apps/TodoApp'
 import { ThemeProvider, createTheme, CssBaseline } from '@mui/material';
 import { useState } from 'react';
-import Home from './pages/Home';
-import About from './pages/About';
-import NotFound from './pages/NotFound';
 import { Routes, Route } from 'react-router-dom'
 import Navbar from './components/Navbar';
+import { lazy, Suspense } from 'react';
+import { CircularProgress } from '@mui/material'
 
+
+const Home = lazy(() => import('./pages/Home'))
+const About = lazy(() => import('./pages/About'))
+const NotFound = lazy(() => import('./pages/NotFound'))
 
 function App() {
   const [mode, setMode] = useState<'light' | 'dark'>('light');
@@ -37,12 +40,14 @@ function App() {
       <CssBaseline />
 
       <Navbar/>
-      <Routes>
-        <Route path='/' element={<Home/>} />
-        <Route path='/todos' element={<TodoApp toggleTheme={toggleTheme} mode={mode} />} />
-        <Route path='/about' element={<About/>} />
-        <Route path='*' element={<NotFound/>} />
-      </Routes>
+      <Suspense fallback={<CircularProgress sx={{m: '2rem auto', display: 'block'}} />}>
+        <Routes>
+          <Route path='/' element={<Home/>} />
+          <Route path='/todos' element={<TodoApp toggleTheme={toggleTheme} mode={mode} />} />
+          <Route path='/about' element={<About/>} />
+          <Route path='*' element={<NotFound/>} />
+        </Routes>
+      </Suspense>
     </ThemeProvider>
   )
 }
